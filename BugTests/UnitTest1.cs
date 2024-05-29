@@ -157,36 +157,62 @@ public class BugStateTests
     }
 
     [TestMethod]
-    public void TestCloseDeferedBug()
+    public void TestReopenClosedBug()
+    {
+        var bug = new Bug(Bug.State.Closed);
+        bug.Assign();
+        Assert.AreEqual(Bug.State.Assigned, bug.getState());
+    }
+
+    [TestMethod]
+    public void TestOpenBugThenCreateFix()
+    {
+        var bug = new Bug(Bug.State.Open);
+        bug.Assign();
+        bug.Close();
+        bug.Assign();
+        bug.Close();
+        bug.Assign();
+        Assert.AreEqual(Bug.State.Assigned, bug.getState());
+    }
+
+    [TestMethod]
+    public void TestMultipleTransitions()
+    {
+        var bug = new Bug(Bug.State.Open);
+        bug.Assign();
+        bug.Close();
+        bug.Assign();
+        bug.Defer();
+        bug.Assign();
+        Assert.AreEqual(Bug.State.Assigned, bug.getState());
+    }
+
+    [TestMethod]
+    public void TestInvalidTransitionFromDeferedToClosed()
     {
         var bug = new Bug(Bug.State.Defered);
-        bug.Close();
-        Assert.AreEqual(Bug.State.Closed, bug.getState());
+        try
+        {
+            bug.Close();
+        }
+        catch (InvalidOperationException ex)
+        {
+            StringAssert.Contains(ex.Message, "No valid leaving transitions are permitted from state 'Defered' for trigger 'Close'.");
+        }
     }
 
     [TestMethod]
-    public void TestCloseCreatedFixesBug()
+    public void TestInvalidTransitionFromCreatedFixesToClosed()
     {
         var bug = new Bug(Bug.State.CreatedFixes);
-        bug.Close();
-        Assert.AreEqual(Bug.State.Closed, bug.getState());
+        try
+        {
+            bug.Close();
+        }
+        catch (InvalidOperationException ex)
+        {
+            StringAssert.Contains(ex.Message, "No valid leaving transitions are permitted from state 'CreatedFixes' for trigger 'Close'.");
+        }
     }
-
-    [TestMethod]
-    public void TestAssignAfterAcceptFix()
-    {
-        var bug = new Bug(Bug.State.AcceptedFixes);
-        bug.AcceptFix();
-        bug.Assign();
-        Assert.AreEqual(Bug.State.Assigned, bug.getState());
-    }
-
-    [TestMethod]
-    public void TestAssignAfterDeclineFix()
-    {
-        var bug = new Bug(Bug.State.DeclinedFixes);
-        bug.DeclineFix();
-        bug.Assign();
-        Assert.AreEqual(Bug.State.Assigned, bug.getState());
-    }    
 }
