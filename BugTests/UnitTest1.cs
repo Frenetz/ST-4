@@ -19,9 +19,51 @@ public class BugStateTests
     }
 
     [TestMethod]
+    public void TestCloseAssignedBug()
+    {
+        var bug = new Bug(Bug.State.Assigned);
+        bug.Close();
+        Assert.AreEqual(Bug.State.Closed, bug.getState());
+    }
+
+    [TestMethod]
+    public void TestCloseDeferedBug()
+    {
+        var bug = new Bug(Bug.State.Defered);
+        bug.Close();
+        Assert.AreEqual(Bug.State.Closed, bug.getState());
+    }
+
+    [TestMethod]
+    public void TestCloseCreatedFixesBug()
+    {
+        var bug = new Bug(Bug.State.CreatedFixes);
+        bug.Close();
+        Assert.AreEqual(Bug.State.Closed, bug.getState());
+    }
+
+    [TestMethod]
     public void TestTransitionFromClosedToAssigned()
     {
         var bug = new Bug(Bug.State.Closed);
+        bug.Assign();
+        Assert.AreEqual(Bug.State.Assigned, bug.getState());
+    }
+
+    [TestMethod]
+    public void TestAssignAfterAcceptFix()
+    {
+        var bug = new Bug(Bug.State.AcceptedFixes);
+        bug.AcceptFix();
+        bug.Assign();
+        Assert.AreEqual(Bug.State.Assigned, bug.getState());
+    }
+
+    [TestMethod]
+    public void TestAssignAfterDeclineFix()
+    {
+        var bug = new Bug(Bug.State.DeclinedFixes);
+        bug.DeclineFix();
         bug.Assign();
         Assert.AreEqual(Bug.State.Assigned, bug.getState());
     }
