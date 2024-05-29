@@ -3,6 +3,21 @@ namespace BugTests;
 [TestClass]
 public class BugStateTests
 {
+
+    [TestMethod]
+    public void TestOpenToAssignedAndBackToOpenMultipleTime()
+    {
+        var bug = new Bug(Bug.State.Open);
+        bug.Assign();
+        bug.Close();
+        bug.Assign();
+        bug.Close();
+        bug.Assign();
+        bug.Close();
+        bug.Assign();                
+        Assert.AreEqual(Bug.State.Assigned, bug.getState());
+    }
+
     [TestMethod]
     public void TestTransitionFromClosedToAssigned()
     {
@@ -28,11 +43,11 @@ public class BugStateTests
     }
 
     [TestMethod]
-    public void TestCreateFixAndAcceptFix()
+    public void TestTransitionFromAssignedToClosed()
     {
-        var bug = new Bug(Bug.State.CreatedFixes);
-        bug.AcceptFix();
-        Assert.AreEqual(Bug.State.AcceptedFixes, bug.getState());
+        var bug = new Bug(Bug.State.Assigned);
+        bug.Close();
+        Assert.AreEqual(Bug.State.Closed, bug.getState());
     }
 
     [TestMethod]
@@ -44,11 +59,11 @@ public class BugStateTests
     }
 
     [TestMethod]
-    public void TestTransitionFromAssignedToClosed()
+    public void TestCreateFixAndAcceptFix()
     {
-        var bug = new Bug(Bug.State.Assigned);
-        bug.Close();
-        Assert.AreEqual(Bug.State.Closed, bug.getState());
+        var bug = new Bug(Bug.State.CreatedFixes);
+        bug.AcceptFix();
+        Assert.AreEqual(Bug.State.AcceptedFixes, bug.getState());
     }
 
     [TestMethod]
